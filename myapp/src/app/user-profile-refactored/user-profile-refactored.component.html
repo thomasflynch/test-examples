@@ -1,0 +1,18 @@
+<form [formGroup]="userForm" *ngIf="!loading">
+  <div>
+    <label>Name:</label>
+    <input formControlName="name">
+  </div>
+  <div>
+    <label>Email:</label>
+    <input formControlName="email" type="email">
+  </div>
+  <div formGroupName="address">
+    <label>Street:</label>
+    <input formControlName="street">
+    <label>City:</label>
+    <input formControlName="city">
+  </div>
+  <button (click)="save()" [disabled]="!userForm.valid">Save</button>
+</form>
+<div *ngIf="error">{{ error }}</div>

@@ -1,0 +1,44 @@
+import { CachingInterceptor } from './caching-interceptor';
+import { CacheService } from './cache.service';
+import { HttpHandler, HttpRequest, HttpEvent, HttpResponse } from '@angular/common/http';
+import { of } from 'rxjs';
+
+describe('CachingInterceptor', () => {
+  let interceptor: CachingInterceptor;
+  let cacheService: CacheService;
+  let next: HttpHandler;
+
+  beforeEach(() => {
+    cacheService = new CacheService();
+    interceptor = new CachingInterceptor(cacheService);
+    next = {
+      handle: jest.fn().mockImplementation((req: HttpRequest<any>) => of(new HttpResponse({ status: 200 })))
+    };
+  });
+
+  it('should cache the response of GET requests', (done) => {
+    const req = new HttpRequest('GET', 'http://example.com/data');
+
+    // First request - should go through and be cached
+    interceptor.intercept(req, next).subscribe((response) => {
+      expect(response).toBeInstanceOf(HttpResponse);
+      expect(next.handle).toHaveBeenCalledWith(req);
+
+      // Second request - should be served from cache
+      interceptor.intercept(req, next).subscribe((cachedResponse) => {
+        expect(cachedResponse).toBeInstanceOf(HttpResponse);
+        expect(next.handle).toHaveBeenCalledTimes(1); // Still one, as second response should come from cache
+        done();
+      });
+    });
+  });
+
+  it('should not cache non-GET requests', () => {
+    const req = new HttpRequest('POST', 'http://example.com/data');
+
+    interceptor.intercept(req, next).subscribe(() => {
+      expect(next.handle).toHaveBeenCalledTimes(1);
+      expect(cacheService.get(req.url)).toBeNull();
+    });
+  });
+});

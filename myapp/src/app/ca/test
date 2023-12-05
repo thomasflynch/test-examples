@@ -1,0 +1,17 @@
+import { Component } from '@angular/core';
+import { CacheService } from './cache.service';
+
+@Component({
+  // component metadata
+})
+export class YourComponent {
+  constructor(private cacheService: CacheService) {}
+
+  clearCacheForUrl(url: string): void {
+    this.cacheService.invalidate(url);
+  }
+
+  clearAllCache(): void {
+    this.cacheService.clear();
+  }
+}

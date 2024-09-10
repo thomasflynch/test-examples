@@ -1,0 +1,14 @@
+@echo off
+setlocal enabledelayedexpansion
+
+:: Number of files to create
+set numFiles=10
+
+:: Loop to create files
+for /L %%i in (1,1,%numFiles%) do (
+    set filename=500mblargefile%%i
+    fsutil file createnew !filename! 524880000
+    echo Created !filename!
+)
+
+endlocal

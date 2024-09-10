@@ -1,0 +1,38 @@
+import { CacheService } from './cache.service';
+import { HttpResponse } from '@angular/common/http';
+
+describe('CacheService', () => {
+  let cacheService: CacheService;
+  const testUrl = 'http://example.com/data';
+  const testResponse = new HttpResponse({ body: { data: 'test' } });
+  const ttl = 60000; // 60 seconds
+
+  beforeEach(() => {
+    cacheService = new CacheService();
+  });
+
+  it('should store and retrieve a response', () => {
+    cacheService.put(testUrl, testResponse, ttl);
+    expect(cacheService.get(testUrl)).toEqual(testResponse);
+  });
+
+  it('should return null for expired cache entries', (done) => {
+    cacheService.put(testUrl, testResponse, 1); // 1 millisecond
+    setTimeout(() => {
+      expect(cacheService.get(testUrl)).toBeNull();
+      done();
+    }, 10); // check after 10 milliseconds
+  });
+
+  it('should invalidate a cache entry', () => {
+    cacheService.put(testUrl, testResponse, ttl);
+    cacheService.invalidate(testUrl);
+    expect(cacheService.get(testUrl)).toBeNull();
+  });
+
+  it('should clear all cache entries', () => {
+    cacheService.put(testUrl, testResponse, ttl);
+    cacheService.clear();
+    expect(cacheService.get(testUrl)).toBeNull();
+  });
+});

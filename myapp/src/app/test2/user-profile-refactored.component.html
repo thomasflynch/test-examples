@@ -1,18 +1,36 @@
-<form [formGroup]="userForm" *ngIf="!loading">
-  <div>
-    <label>Name:</label>
-    <input formControlName="name">
+<div class="upload-error" role="alert" aria-live="polite" *ngIf="count > 0">
+  <div class="msg">
+    <mat-icon aria-hidden="true">warning</mat-icon>
+    <span>
+      You can upload up to {{ max }} files at a time.
+      {{ count }} file{{ count === 1 ? '' : 's' }} weren’t added.
+    </span>
+    <span *ngIf="acceptedCountThisAttempt > 0" class="hint">
+      ({{ acceptedCountThisAttempt }} accepted from this selection)
+    </span>
   </div>
-  <div>
-    <label>Email:</label>
-    <input formControlName="email" type="email">
+
+  <div class="preview" *ngIf="previewNames.length > 0">
+    <span class="label">Examples:</span>
+    <code class="file" *ngFor="let n of previewNames">{{ n }}</code>
+    <span *ngIf="remainingCount > 0" class="more">
+      and {{ remainingCount }} more…
+    </span>
   </div>
-  <div formGroupName="address">
-    <label>Street:</label>
-    <input formControlName="street">
-    <label>City:</label>
-    <input formControlName="city">
+
+  <button mat-button type="button" class="details-btn" (click)="toggleDetails()">
+    <mat-icon aria-hidden="true">
+      {{ showDetails ? 'expand_less' : 'expand_more' }}
+    </mat-icon>
+    {{ showDetails ? 'Hide details' : 'Show details' }}
+  </button>
+
+  <div class="details" *ngIf="showDetails">
+    <ul>
+      <li *ngFor="let f of rejectedFiles">
+        <mat-icon aria-hidden="true">do_not_disturb_on</mat-icon>
+        <span class="name">{{ f.name }}</span>
+      </li>
+    </ul>
   </div>
-  <button (click)="save()" [disabled]="!userForm.valid">Save</button>
-</form>
-<div *ngIf="error">{{ error }}</div>
+</div>

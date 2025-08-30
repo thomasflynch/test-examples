@@ -1,36 +1,51 @@
-<div class="upload-error" role="alert" aria-live="polite" *ngIf="count > 0">
-  <div class="msg">
-    <mat-icon aria-hidden="true">warning</mat-icon>
-    <span>
-      You can upload up to {{ max }} files at a time.
-      {{ count }} file{{ count === 1 ? '' : 's' }} weren’t added.
-    </span>
-    <span *ngIf="acceptedCountThisAttempt > 0" class="hint">
-      ({{ acceptedCountThisAttempt }} accepted from this selection)
-    </span>
-  </div>
+<!-- If used in a dialog, show a title -->
+<h2 *ngIf="dialogRef" mat-dialog-title>Too many files</h2>
 
-  <div class="preview" *ngIf="previewNames.length > 0">
-    <span class="label">Examples:</span>
-    <code class="file" *ngFor="let n of previewNames">{{ n }}</code>
-    <span *ngIf="remainingCount > 0" class="more">
-      and {{ remainingCount }} more…
-    </span>
-  </div>
+<mat-dialog-content *ngIf="dialogRef; else inlineBlock">
+  <ng-container [ngTemplateOutlet]="contentTpl"></ng-container>
+</mat-dialog-content>
 
-  <button mat-button type="button" class="details-btn" (click)="toggleDetails()">
-    <mat-icon aria-hidden="true">
-      {{ showDetails ? 'expand_less' : 'expand_more' }}
-    </mat-icon>
-    {{ showDetails ? 'Hide details' : 'Show details' }}
-  </button>
-
-  <div class="details" *ngIf="showDetails">
-    <ul>
-      <li *ngFor="let f of rejectedFiles">
-        <mat-icon aria-hidden="true">do_not_disturb_on</mat-icon>
-        <span class="name">{{ f.name }}</span>
-      </li>
-    </ul>
+<ng-template #inlineBlock>
+  <div class="inline-wrapper">
+    <ng-container [ngTemplateOutlet]="contentTpl"></ng-container>
   </div>
-</div>
+</ng-template>
+
+<ng-template #contentTpl>
+  <div class="upload-error" role="alert" aria-live="polite" *ngIf="count > 0">
+    <div class="msg">
+      <mat-icon aria-hidden="true">warning</mat-icon>
+      <span>
+        You can upload up to {{ max }} files at a time.
+        {{ count }} file{{ count === 1 ? '' : 's' }} weren’t added.
+      </span>
+      <span *ngIf="acceptedCountThisAttempt > 0" class="hint">
+        ({{ acceptedCountThisAttempt }} accepted from this selection)
+      </span>
+    </div>
+
+    <div class="preview" *ngIf="previewNames.length > 0">
+      <span class="label">Examples:</span>
+      <code class="file" *ngFor="let n of previewNames">{{ n }}</code>
+      <span *ngIf="remainingCount > 0" class="more">and {{ remainingCount }} more…</span>
+    </div>
+
+    <button mat-button type="button" class="details-btn" (click)="toggleDetails()">
+      <mat-icon aria-hidden="true">{{ showDetails ? 'expand_less' : 'expand_more' }}</mat-icon>
+      {{ showDetails ? 'Hide details' : 'Show details' }}
+    </button>
+
+    <div class="details" *ngIf="showDetails">
+      <ul>
+        <li *ngFor="let f of rejectedFiles">
+          <mat-icon aria-hidden="true">do_not_disturb_on</mat-icon>
+          <span class="name">{{ f.name }}</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</ng-template>
+
+<mat-dialog-actions *ngIf="dialogRef && showActions" align="end">
+  <button mat-button (click)="close()">OK</button>
+</mat-dialog-actions>
